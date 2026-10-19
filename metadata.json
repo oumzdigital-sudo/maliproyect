@@ -1,0 +1,8 @@
+{
+  "name": "Groupe Kaniba - Immobilier & Construction au Mali",
+  "description": "Plateforme immobilière moderne pour Bamako et Sirakoro. Terrains avec Titre Foncier, villas, suivi de dossiers notariés et investissement sécurisé pour la diaspora.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

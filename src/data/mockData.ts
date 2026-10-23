@@ -1,11 +1,11 @@
 import { Property, TrackingDossier, NotificationItem } from '../types';
 
 export const ASSETS = {
-  heroCiteKaniba: '/src/assets/images/hero_cite_kaniba_1792444493893.jpg',
-  propertyVilla: '/src/assets/images/property_sirakoro_villa_1792444493913.jpg',
-  propertyTerrain: '/src/assets/images/property_terrain_foncier_1792444495046.jpg',
-  constructionProgress: '/src/assets/images/construction_before_after_1792444496039.jpg',
-  diasporaFamily: '/src/assets/images/diaspora_investment_mali_1792444496023.jpg',
+  heroCiteKaniba: '/assets/images/hero_cite_kaniba_1792444493893.jpg',
+  propertyVilla: '/assets/images/property_sirakoro_villa_1792444493913.jpg',
+  propertyTerrain: '/assets/images/property_terrain_foncier_1792444495046.jpg',
+  constructionProgress: '/assets/images/construction_before_after_1792444496039.jpg',
+  diasporaFamily: '/assets/images/diaspora_investment_mali_1792444496023.jpg',
   tiktokProfile: '/assets/aistudio/image_ca295a99.png',
 };
 

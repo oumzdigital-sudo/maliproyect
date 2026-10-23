@@ -12,14 +12,27 @@ export const PrivacyBanner: React.FC<PrivacyBannerProps> = ({ language }) => {
   const t = TRANSLATIONS[language];
 
   useEffect(() => {
-    const stored = localStorage.getItem('kaniba_privacy_consent_v2');
-    if (!stored) {
-      setAccepted(false);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const stored = window.localStorage.getItem('kaniba_privacy_consent_v2');
+        if (!stored) {
+          setAccepted(false);
+        }
+      }
+    } catch {
+      // Storage access blocked in sandboxed iframe
+      setAccepted(true);
     }
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem('kaniba_privacy_consent_v2', 'true');
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('kaniba_privacy_consent_v2', 'true');
+      }
+    } catch {
+      // ignore
+    }
     setAccepted(true);
   };
 

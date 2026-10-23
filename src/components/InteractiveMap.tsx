@@ -302,60 +302,63 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           </div>
 
           {/* Selected Property Popup Card */}
-          {selectedProperty && (
-            <div className="absolute bottom-3 inset-x-3 sm:inset-x-auto sm:right-4 sm:bottom-4 z-30 max-w-sm w-[calc(100%-1.5rem)] sm:w-full bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-700 p-3 sm:p-4 transition-all">
-              <div className="flex gap-3">
-                <img
-                  src={selectedProperty.imageUrl}
-                  alt={selectedProperty.title[language]}
-                  className="w-18 h-18 sm:w-20 sm:h-20 rounded-xl object-cover shrink-0 border border-stone-200 dark:border-stone-800"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between text-[11px] text-stone-500 dark:text-stone-400">
-                    <span className="text-emerald-700 dark:text-amber-400 font-semibold truncate flex items-center gap-1">
-                      <span>🇲🇱</span>
-                      <span>{selectedProperty.documentType}</span>
-                    </span>
-                    <span className="font-mono">{selectedProperty.surfaceM2} m²</span>
-                  </div>
+          {selectedProperty && (() => {
+            const selectedTitle = selectedProperty.title[language] || selectedProperty.title.es || '';
+            return (
+              <div className="absolute bottom-3 inset-x-3 sm:inset-x-auto sm:right-4 sm:bottom-4 z-30 max-w-sm w-[calc(100%-1.5rem)] sm:w-full bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-700 p-3 sm:p-4 transition-all">
+                <div className="flex gap-3">
+                  <img
+                    src={selectedProperty.imageUrl}
+                    alt={selectedTitle}
+                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-xl object-cover shrink-0 border border-stone-200 dark:border-stone-800"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between text-[11px] text-stone-500 dark:text-stone-400">
+                      <span className="text-emerald-700 dark:text-amber-400 font-semibold truncate flex items-center gap-1">
+                        <span>🇲🇱</span>
+                        <span>{selectedProperty.documentType}</span>
+                      </span>
+                      <span className="font-mono">{selectedProperty.surfaceM2} m²</span>
+                    </div>
 
-                  <h4 className="text-xs sm:text-sm font-bold text-stone-900 dark:text-white truncate mt-0.5">
-                    {selectedProperty.title[language] || selectedProperty.title.es}
-                  </h4>
+                    <h4 className="text-xs sm:text-sm font-bold text-stone-900 dark:text-white truncate mt-0.5">
+                      {selectedTitle}
+                    </h4>
 
-                  <p className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 mt-0.5 truncate">
-                    <MapPin className="w-3 h-3 text-amber-500 shrink-0" />
-                    <span>{selectedProperty.location}</span>
-                  </p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 mt-0.5 truncate">
+                      <MapPin className="w-3 h-3 text-amber-500 shrink-0" />
+                      <span>{selectedProperty.location}</span>
+                    </p>
 
-                  <div className="mt-1 text-xs sm:text-sm font-extrabold text-emerald-950 dark:text-amber-400 font-mono">
-                    {formatCurrency(selectedProperty.priceFCFA, currency)}
+                    <div className="mt-1 text-xs sm:text-sm font-extrabold text-emerald-950 dark:text-amber-400 font-mono">
+                      {formatCurrency(selectedProperty.priceFCFA, currency)}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-stone-100 dark:border-stone-800">
-                <button
-                  onClick={() => onSelectProperty(selectedProperty)}
-                  className="py-1.5 px-2.5 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 text-xs font-semibold rounded-lg text-center truncate"
-                >
-                  {t.map.btnSheetPlans}
-                </button>
-                <a
-                  href={generateWhatsAppLink(
-                    CONTACT_INFO.whatsappPrimary,
-                    `Bonjour, je regarde la parcelle ${selectedProperty.title[language]} sur la carte de Sirakoro/Bamako (Mali 🇲🇱).`
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-1.5 px-2.5 bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg text-center truncate"
-                >
-                  {t.map.btnSheetWhatsApp}
-                </a>
+                {/* Action Buttons */}
+                <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-stone-100 dark:border-stone-800">
+                  <button
+                    onClick={() => onSelectProperty(selectedProperty)}
+                    className="py-1.5 px-2.5 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 text-xs font-semibold rounded-lg text-center truncate"
+                  >
+                    {t.map.btnSheetPlans}
+                  </button>
+                  <a
+                    href={generateWhatsAppLink(
+                      CONTACT_INFO.whatsappPrimary,
+                      `Bonjour, je regarde la parcelle ${selectedTitle} sur la carte de Sirakoro/Bamako (Mali 🇲🇱).`
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-1.5 px-2.5 bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg text-center truncate"
+                  >
+                    {t.map.btnSheetWhatsApp}
+                  </a>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
         </div>
 

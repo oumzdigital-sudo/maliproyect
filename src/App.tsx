@@ -30,8 +30,14 @@ export default function App() {
 
   // Initialize and persist dark mode
   useEffect(() => {
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setDarkMode(isDark);
+    try {
+      if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setDarkMode(isDark);
+      }
+    } catch {
+      // fallback
+    }
   }, []);
 
   useEffect(() => {

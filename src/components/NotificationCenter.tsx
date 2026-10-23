@@ -11,7 +11,8 @@ import {
   ExternalLink,
   ShieldCheck
 } from 'lucide-react';
-import { NotificationItem } from '../types';
+import { NotificationItem, Language } from '../types';
+import { TRANSLATIONS } from '../i18n/translations';
 
 interface NotificationCenterProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface NotificationCenterProps {
   notifications: NotificationItem[];
   onMarkAllAsRead: () => void;
   onNavigateAction?: (action: string) => void;
+  language: Language;
 }
 
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({
@@ -27,9 +29,10 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   notifications,
   onMarkAllAsRead,
   onNavigateAction,
+  language,
 }) => {
   const [pushEnabled, setPushEnabled] = useState(false);
-  const [permissionState, setPermissionState] = useState<string>('default');
+  const t = TRANSLATIONS[language];
 
   if (!isOpen) return null;
 
@@ -37,11 +40,14 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     if ('Notification' in window) {
       try {
         const perm = await Notification.requestPermission();
-        setPermissionState(perm);
         if (perm === 'granted') {
           setPushEnabled(true);
-          new Notification('Groupe Kaniba Immobilier', {
-            body: 'Notifications push activées avec succès pour vos alertes de Titres Fonciers.',
+          new Notification('Groupe Kaniba Immobilier 🇲🇱', {
+            body: language === 'es'
+              ? 'Notificaciones push activadas para tus alertas de Títulos Fonciers.'
+              : language === 'en'
+              ? 'Push notifications enabled for your Land Title updates.'
+              : 'Notifications push activées avec succès pour vos alertes de Titres Fonciers.',
             icon: '/assets/aistudio/image_ca295a99.png',
           });
         }
@@ -62,22 +68,23 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         role="dialog"
         aria-modal="true"
       >
-        {/* Header */}
+        {/* Header with Mali Flag */}
         <div className="p-4 sm:p-5 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-900/10 dark:bg-emerald-900/40 text-emerald-800 dark:text-amber-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-900/10 dark:bg-emerald-900/40 text-emerald-800 dark:text-amber-400 flex items-center justify-center relative">
               <Bell className="w-4 h-4" />
+              <span className="absolute -bottom-1 -right-1 text-[10px]">🇲🇱</span>
             </div>
             <div>
               <h3 className="text-sm font-bold text-stone-900 dark:text-white flex items-center gap-2">
-                <span>Centre de Notifications</span>
+                <span>{t.notificationsCenter.title}</span>
                 {unreadCount > 0 && (
                   <span className="text-[10px] bg-amber-500 text-stone-950 px-2 py-0.5 rounded-full font-bold">
-                    {unreadCount} nouveau(x)
+                    {unreadCount}
                   </span>
                 )}
               </h3>
-              <p className="text-[11px] text-stone-500">Alertes Titres Fonciers & Chantiers</p>
+              <p className="text-[11px] text-stone-500">{t.notificationsCenter.subtitle}</p>
             </div>
           </div>
 
@@ -90,11 +97,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         </div>
 
         {/* Push Activation Banner */}
-        <div className="p-3.5 mx-4 mt-3 bg-stone-50 dark:bg-stone-800/70 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-between gap-3 text-xs">
+        <div className="p-3 mx-4 mt-3 bg-stone-50 dark:bg-stone-800/70 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-amber-400 shrink-0" />
             <span className="text-stone-700 dark:text-stone-300">
-              {pushEnabled ? 'Notifications Push Actives' : 'Activer les alertes sur mobile'}
+              {pushEnabled ? t.notificationsCenter.pushActive : t.notificationsCenter.pushMobileTitle}
             </span>
           </div>
 
@@ -103,11 +110,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               onClick={handleRequestPush}
               className="px-2.5 py-1 bg-emerald-800 hover:bg-emerald-700 text-white rounded-md text-[11px] font-semibold whitespace-nowrap"
             >
-              Autoriser
+              {t.notificationsCenter.btnAuthorize}
             </button>
           ) : (
             <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-              <Check className="w-3 h-3" /> Connecté
+              <Check className="w-3 h-3" /> OK
             </span>
           )}
         </div>
@@ -119,6 +126,10 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               item.type === 'document' ? FileCheck2 :
               item.type === 'property' ? Building :
               item.type === 'construction' ? Hammer : Cloud;
+
+            const itemTitle = item.title[language] || item.title.es;
+            const itemMsg = item.message[language] || item.message.es;
+            const itemTime = item.time[language] || item.time.es;
 
             return (
               <div
@@ -141,15 +152,15 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-0.5">
                       <span className="font-bold text-stone-900 dark:text-white truncate">
-                        {item.title}
+                        {itemTitle}
                       </span>
                       <span className="text-[10px] text-stone-400 font-mono shrink-0 ml-2">
-                        {item.time}
+                        {itemTime}
                       </span>
                     </div>
 
                     <p className="text-[11px] leading-relaxed text-stone-600 dark:text-stone-300">
-                      {item.message}
+                      {itemMsg}
                     </p>
 
                     {item.linkAction && (
@@ -160,7 +171,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                         }}
                         className="mt-2 text-[11px] font-semibold text-emerald-800 dark:text-amber-400 hover:underline flex items-center gap-1"
                       >
-                        <span>Consulter la mise à jour</span>
+                        <span>{t.notificationsCenter.seeUpdate}</span>
                         <ExternalLink className="w-3 h-3" />
                       </button>
                     )}
@@ -178,14 +189,14 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             className="text-xs font-semibold text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white flex items-center gap-1.5"
           >
             <CheckCheck className="w-3.5 h-3.5" />
-            <span>Tout marquer comme lu</span>
+            <span>{t.notificationsCenter.btnMarkAllRead}</span>
           </button>
 
           <button
             onClick={onClose}
             className="px-4 py-2 bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 rounded-lg text-xs font-semibold"
           >
-            Fermer
+            {t.notificationsCenter.btnClose}
           </button>
         </div>
 

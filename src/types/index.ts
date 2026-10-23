@@ -1,10 +1,23 @@
 export type PropertyType = 'terreno' | 'casa' | 'construccion' | 'chateau_ferme';
 export type DocumentType = 'Titre Foncier (TF)' | 'Permis d\'Occuper' | 'Concession Rurale';
 export type CurrencyCode = 'XOF' | 'EUR' | 'USD';
+export type Language = 'es' | 'fr' | 'en';
+
+export interface LocalizedString {
+  es: string;
+  fr: string;
+  en: string;
+}
+
+export interface LocalizedFeatures {
+  es: string[];
+  fr: string[];
+  en: string[];
+}
 
 export interface Property {
   id: string;
-  title: string;
+  title: LocalizedString;
   type: PropertyType;
   location: string;
   zone: 'Sirakoro' | 'Bamako' | 'Dialakorobougou' | 'Sotuba' | 'Kati' | 'Moribabougou' | 'Sanankoroba';
@@ -20,28 +33,28 @@ export interface Property {
   tfNumber?: string;
   imageUrl: string;
   gallery: string[];
-  description: string;
-  features: string[];
+  description: LocalizedString;
+  features: LocalizedFeatures;
   isFeatured: boolean;
   status: 'disponible' | 'reserve' | 'vendu';
-  badgeLabel?: string;
+  badgeLabel?: LocalizedString;
   videoUrl?: string;
 }
 
 export interface TrackingStep {
   stepNumber: number;
-  title: string;
-  description: string;
+  title: LocalizedString;
+  description: LocalizedString;
   date: string;
   status: 'completed' | 'in_progress' | 'pending';
-  authority: string;
+  authority: LocalizedString;
 }
 
 export interface TrackingDossier {
   code: string;
   clientName: string;
   phone: string;
-  propertyTitle: string;
+  propertyTitle: LocalizedString;
   location: string;
   lotNumber: string;
   surfaceM2: number;
@@ -49,7 +62,7 @@ export interface TrackingDossier {
   amountPaidFCFA: number;
   currentStep: number;
   totalSteps: number;
-  lastUpdate: string;
+  lastUpdate: LocalizedString;
   notaryName: string;
   isSecuredBiometric: boolean;
   steps: TrackingStep[];
@@ -64,9 +77,9 @@ export interface TrackingDossier {
 
 export interface NotificationItem {
   id: string;
-  title: string;
-  message: string;
-  time: string;
+  title: LocalizedString;
+  message: LocalizedString;
+  time: LocalizedString;
   type: 'document' | 'property' | 'construction' | 'system';
   read: boolean;
   linkAction?: string;

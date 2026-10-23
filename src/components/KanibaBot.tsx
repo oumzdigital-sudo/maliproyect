@@ -1,49 +1,54 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  MessageSquare, 
   X, 
   Send, 
-  Bot, 
-  User, 
-  Sparkles, 
-  ExternalLink, 
-  Phone, 
-  HelpCircle,
-  Minimize2,
-  Maximize2
+  Bot
 } from 'lucide-react';
-import { FAQ_KNOWLEDGE_BASE, CONTACT_INFO } from '../data/mockData';
-import { ChatMessage } from '../types';
+import { CONTACT_INFO } from '../data/mockData';
+import { ChatMessage, Language } from '../types';
 import { generateWhatsAppLink } from '../utils/formatters';
+import { TRANSLATIONS } from '../i18n/translations';
 
 interface KanibaBotProps {
   isOpen: boolean;
   onClose: () => void;
   onOpen: () => void;
+  language: Language;
 }
 
 export const KanibaBot: React.FC<KanibaBotProps> = ({
   isOpen,
   onClose,
   onOpen,
+  language,
 }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'msg-1',
-      sender: 'bot',
-      text: 'Bonjour ! Je suis l’assistant virtuel du Groupe Kaniba. Comment puis-je vous aider aujourd’hui pour votre recherche de terrain ou villa à Bamako et Sirakoro ?',
-      time: 'Maintenant',
-      suggestedActions: [
-        { label: '📍 Prix à Sirakoro', action: 'Prix des parcelles à Sirakoro' },
-        { label: '📜 Qu’est-ce qu’un Titre Foncier ?', action: 'Explication Titre Foncier Mali' },
-        { label: '🌍 Guide Diáspora', action: 'Comment acheter depuis la diaspora ?' },
-        { label: '🔑 Visite sur terrain', action: 'Prendre rendez-vous pour visiter' },
-      ],
-    },
-  ]);
+  const t = TRANSLATIONS[language];
+
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize or reset bot greeting when language changes
+  useEffect(() => {
+    setMessages([
+      {
+        id: `msg-welcome-${language}`,
+        sender: 'bot',
+        text: t.bot.greeting,
+        time: new Date().toLocaleTimeString(language === 'es' ? 'es-ES' : language === 'en' ? 'en-US' : 'fr-FR', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        suggestedActions: [
+          { label: t.bot.chipSirakoro, action: t.bot.querySirakoro },
+          { label: t.bot.chipTf, action: t.bot.queryTf },
+          { label: t.bot.chipDiaspora, action: t.bot.queryDiaspora },
+          { label: t.bot.chipVisit, action: t.bot.queryVisit },
+        ],
+      },
+    ]);
+  }, [language]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -55,16 +60,20 @@ export const KanibaBot: React.FC<KanibaBotProps> = ({
     }
   }, [messages, isOpen]);
 
-  // Intelligent responder matching keywords from the local real estate engine
   const handleSendMessage = (textToSend?: string) => {
     const query = (textToSend || inputText).trim();
     if (!query) return;
+
+    const timeStr = new Date().toLocaleTimeString(language === 'es' ? 'es-ES' : language === 'en' ? 'en-US' : 'fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       sender: 'user',
       text: query,
-      time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      time: timeStr,
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -75,37 +84,37 @@ export const KanibaBot: React.FC<KanibaBotProps> = ({
       const lower = query.toLowerCase();
       let matchedAnswer: string | null = null;
 
-      for (const item of FAQ_KNOWLEDGE_BASE) {
-        if (item.keywords.some((kw) => lower.includes(kw))) {
-          matchedAnswer = item.answer;
-          break;
-        }
-      }
-
-      if (!matchedAnswer) {
-        if (lower.includes('bonjour') || lower.includes('salut') || lower.includes('hola')) {
-          matchedAnswer = 'Bonjour et bienvenue chez le Groupe Kaniba ! Nous commercialisons des parcelles avec Titre Foncier (TF) à Sirakoro, Dialakorobougou, et des villas clés en main à La Cité Kaniba. Que souhaitez-vous savoir en priorité ?';
-        } else if (lower.includes('contact') || lower.includes('numero') || lower.includes('telephone') || lower.includes('bureau')) {
-          matchedAnswer = `Vous pouvez joindre directement nos conseillers commerciaux au ${CONTACT_INFO.phones[0]} ou ${CONTACT_INFO.phones[1]}. Nos bureaux sont situés à l’ACI 2000 et à l’entrée de la Cité Kaniba à Sirakoro.`;
-        } else {
-          matchedAnswer = `Merci pour votre question concernant "${query}". Pour vous fournir les plans cadastraux exacts et les disponibilités en temps réel, je peux vous mettre en relation directe avec notre conseiller sur WhatsApp au ${CONTACT_INFO.phones[0]}.`;
-        }
+      if (lower.includes('sirakoro') || lower.includes('prix') || lower.includes('precio') || lower.includes('price') || lower.includes('cost')) {
+        matchedAnswer = t.bot.answerSirakoro;
+      } else if (lower.includes('titre') || lower.includes('foncier') || lower.includes('título') || lower.includes('title') || lower.includes('legal') || lower.includes('notaire') || lower.includes('notario')) {
+        matchedAnswer = t.bot.answerTf;
+      } else if (lower.includes('diaspora') || lower.includes('france') || lower.includes('francia') || lower.includes('espagne') || lower.includes('españa') || lower.includes('spain') || lower.includes('usa') || lower.includes('distance') || lower.includes('abroad')) {
+        matchedAnswer = t.bot.answerDiaspora;
+      } else if (lower.includes('construction') || lower.includes('construccion') || lower.includes('villa') || lower.includes('chalet') || lower.includes('batir') || lower.includes('build')) {
+        matchedAnswer = t.bot.answerConstruction;
+      } else if (lower.includes('visite') || lower.includes('visita') || lower.includes('visit') || lower.includes('rdv') || lower.includes('rendez-vous') || lower.includes('cita') || lower.includes('tour')) {
+        matchedAnswer = t.bot.answerVisit;
+      } else {
+        matchedAnswer = t.bot.answerFallback;
       }
 
       const botResponse: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
         sender: 'bot',
         text: matchedAnswer,
-        time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        time: new Date().toLocaleTimeString(language === 'es' ? 'es-ES' : language === 'en' ? 'en-US' : 'fr-FR', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
         suggestedActions: [
-          { label: '💬 Parler sur WhatsApp', action: 'whatsapp_handoff' },
-          { label: '📐 Voir le catalogue', action: 'catalogo' },
+          { label: t.bot.btnWhatsAppHandoff, action: 'whatsapp_handoff' },
+          { label: t.bot.btnCatalog, action: 'catalogo' },
         ],
       };
 
       setMessages((prev) => [...prev, botResponse]);
       setIsTyping(false);
-    }, 700);
+    }, 650);
   };
 
   const handleActionClick = (action: string) => {
@@ -113,7 +122,11 @@ export const KanibaBot: React.FC<KanibaBotProps> = ({
       window.open(
         generateWhatsAppLink(
           CONTACT_INFO.whatsappPrimary,
-          'Bonjour, je viens de discuter avec votre assistant virtuel sur le site et je souhaite des précisions.'
+          language === 'es'
+            ? 'Hola, estuve chateando con KanibaBot y deseo atención personalizada para una propiedad en Malí 🇲🇱.'
+            : language === 'en'
+            ? 'Hello, I chatted with KanibaBot and would like personalized assistance for a property in Mali 🇲🇱.'
+            : 'Bonjour, j’ai échangé avec KanibaBot et je souhaite une assistance personnalisée pour un projet au Mali 🇲🇱.'
         ),
         '_blank'
       );
@@ -130,45 +143,46 @@ export const KanibaBot: React.FC<KanibaBotProps> = ({
     return (
       <button
         onClick={onOpen}
-        aria-label="Ouvrir le chat d'assistance"
-        className="fixed bottom-6 right-20 sm:right-24 z-40 p-3.5 bg-emerald-900 hover:bg-emerald-800 text-amber-300 rounded-full shadow-2xl border border-amber-400/40 transition-transform hover:scale-105 flex items-center gap-2"
+        aria-label={t.bot.title}
+        className="fixed bottom-6 right-20 sm:right-24 z-40 p-3 sm:p-3.5 bg-emerald-900 hover:bg-emerald-800 text-amber-300 rounded-full shadow-2xl border border-amber-400/40 transition-transform hover:scale-105 flex items-center gap-2"
       >
-        <Bot className="w-6 h-6 text-amber-400" />
-        <span className="hidden md:inline text-xs font-bold text-white pr-1">Conseiller Kaniba</span>
+        <span className="text-sm">🇲🇱</span>
+        <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
+        <span className="hidden md:inline text-xs font-bold text-white pr-1">KanibaBot</span>
         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
       </button>
     );
   }
 
   return (
-    <div className="fixed bottom-5 right-4 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-96 max-w-sm h-[520px] max-h-[85vh] bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5">
+    <div className="fixed bottom-5 right-4 sm:right-6 left-4 sm:left-auto z-50 w-[calc(100%-2rem)] sm:w-96 max-w-sm h-[500px] max-h-[82vh] bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5">
       
-      {/* Bot Header */}
-      <div className="p-4 bg-emerald-950 text-white flex items-center justify-between border-b border-emerald-900">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-emerald-800 flex items-center justify-center text-amber-400 border border-amber-400/30">
+      {/* Bot Header with Mali Flag */}
+      <div className="p-3.5 sm:p-4 bg-emerald-950 text-white flex items-center justify-between border-b border-emerald-900">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-emerald-800 flex items-center justify-center text-amber-400 border border-amber-400/30 shrink-0">
             <Bot className="w-5 h-5" />
           </div>
-          <div>
-            <h4 className="text-sm font-bold flex items-center gap-1.5">
-              <span>KanibaBot 24/7</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <div className="min-w-0">
+            <h4 className="text-xs sm:text-sm font-bold flex items-center gap-1.5 truncate">
+              <span>{t.bot.title}</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
             </h4>
-            <p className="text-[11px] text-stone-300">Conseiller Immobilier & Titres Fonciers</p>
+            <p className="text-[10px] sm:text-[11px] text-stone-300 truncate">{t.bot.role}</p>
           </div>
         </div>
 
         <button
           onClick={onClose}
           aria-label="Fermer"
-          className="text-stone-300 hover:text-white p-1 rounded-lg"
+          className="text-stone-300 hover:text-white p-1 rounded-lg shrink-0 ml-2"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Messages Scroll View */}
-      <div className="flex-1 p-3.5 overflow-y-auto space-y-3 bg-stone-50 dark:bg-stone-950 text-xs">
+      <div className="flex-1 p-3 sm:p-3.5 overflow-y-auto space-y-3 bg-stone-50 dark:bg-stone-950 text-xs">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -181,7 +195,7 @@ export const KanibaBot: React.FC<KanibaBotProps> = ({
                   : 'bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 rounded-bl-none shadow-xs'
               }`}
             >
-              <p className="leading-relaxed whitespace-pre-line">{msg.text}</p>
+              <p className="leading-relaxed whitespace-pre-line text-xs">{msg.text}</p>
               <span className="text-[10px] opacity-70 block text-right mt-1 font-mono">
                 {msg.time}
               </span>
@@ -216,7 +230,7 @@ export const KanibaBot: React.FC<KanibaBotProps> = ({
       </div>
 
       {/* Input Form */}
-      <div className="p-3 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800">
+      <div className="p-2.5 sm:p-3 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -228,7 +242,7 @@ export const KanibaBot: React.FC<KanibaBotProps> = ({
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Posez votre question (ex: prix Sirakoro)..."
+            placeholder={t.bot.inputPlaceholder}
             className="flex-1 py-2 px-3 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-700"
           />
           <button
@@ -241,14 +255,17 @@ export const KanibaBot: React.FC<KanibaBotProps> = ({
         </form>
 
         <div className="flex items-center justify-between text-[10px] text-stone-400 mt-1.5 px-1">
-          <span>Groupe Kaniba AI Advisor</span>
+          <span className="flex items-center gap-1">
+            <span>🇲🇱</span>
+            <span>Groupe Kaniba AI</span>
+          </span>
           <a
             href={generateWhatsAppLink(CONTACT_INFO.whatsappPrimary, 'Bonjour, je souhaite un échange personnalisé.')}
             target="_blank"
             rel="noopener noreferrer"
             className="text-emerald-700 dark:text-amber-400 font-semibold hover:underline"
           >
-            Passer sur WhatsApp →
+            {t.bot.liveHandoffLink}
           </a>
         </div>
       </div>

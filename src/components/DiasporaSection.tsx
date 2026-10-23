@@ -5,22 +5,24 @@ import {
   Video, 
   FileCheck2, 
   Send, 
-  ArrowRight, 
-  Calculator, 
-  Plane,
-  Building,
-  CheckCircle2,
-  BadgeAlert,
-  Percent
+  Calculator
 } from 'lucide-react';
 import { ASSETS, CONTACT_INFO } from '../data/mockData';
 import { formatCurrency, generateWhatsAppLink } from '../utils/formatters';
+import { Language } from '../types';
+import { TRANSLATIONS } from '../i18n/translations';
 
-export const DiasporaSection: React.FC = () => {
+interface DiasporaSectionProps {
+  language: Language;
+}
+
+export const DiasporaSection: React.FC<DiasporaSectionProps> = ({ language }) => {
   const [investBudgetEur, setInvestBudgetEur] = useState<number>(20000);
   const [yearsHolding, setYearsHolding] = useState<number>(3);
   
-  // Rate: 1 EUR = 655.957 FCFA. Average appreciation in Sirakoro / Bamako is ~18% per year
+  const t = TRANSLATIONS[language];
+
+  // Rate: 1 EUR = 655.957 FCFA. Average appreciation in Sirakoro is ~18% per year
   const budgetFCFA = investBudgetEur * 655.957;
   const estimatedFutureFCFA = budgetFCFA * Math.pow(1.18, yearsHolding);
   const estimatedFutureEur = estimatedFutureFCFA / 655.957;
@@ -29,64 +31,65 @@ export const DiasporaSection: React.FC = () => {
   const diasporaPillars = [
     {
       icon: ShieldCheck,
-      title: 'Procuration & Notaire Agréé',
-      text: 'Mandat officiel authentifié par le consulat ou notaire en France/Espagne/USA. Votre nom figure noir sur blanc sur le Titre Foncier national.',
+      title: t.diaspora.pillar1Title,
+      text: t.diaspora.pillar1Desc,
     },
     {
       icon: Video,
-      title: 'Inspections Vidéo par Drone & WhatsApp',
-      text: 'Visite en direct avec notre géomètre sur la parcelle de Sirakoro. Vous visualisez les bornes en béton réelles avant tout versement.',
+      title: t.diaspora.pillar2Title,
+      text: t.diaspora.pillar2Desc,
     },
     {
       icon: FileCheck2,
-      title: 'Compte Sécurisé & Virement Bancaire',
-      text: 'Fonds logés sur compte bancaire séquestre avec quittance officielle et morcellement cadastral suivi étape par étape.',
+      title: t.diaspora.pillar3Title,
+      text: t.diaspora.pillar3Desc,
     },
     {
       icon: Send,
-      title: 'Expédition Titre Foncier par DHL Express',
-      text: 'Réception sécurisée de vos documents juridiques originaux directement à votre domicile en Europe, Amérique ou Afrique.',
+      title: t.diaspora.pillar4Title,
+      text: t.diaspora.pillar4Desc,
     },
   ];
 
   return (
-    <section id="diaspora" className="py-16 sm:py-24 bg-stone-900 text-white relative overflow-hidden">
-      {/* Decorative background glow */}
-      <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+    <section id="diaspora" className="py-12 sm:py-24 bg-stone-900 text-white relative w-full max-w-full overflow-hidden">
+      {/* Decorative background glow strictly clipped */}
+      <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-72 sm:w-96 h-72 sm:h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 w-72 sm:w-96 h-72 sm:h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         
         {/* Main Grid Hero */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-12 sm:mb-16">
           
           {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-widest bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20">
+          <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+            <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-widest bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 self-start">
+              <span>🇲🇱</span>
               <Globe2 className="w-4 h-4" />
-              <span>Guichet Spécial Diáspora Malienne & Internationale</span>
+              <span>{t.diaspora.badge}</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight text-balance">
-              ¿Vives en el extranjero? Invierte en Mali con total seguridad.
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              {t.diaspora.title}
             </h2>
 
-            <p className="text-base sm:text-lg text-stone-300 leading-relaxed font-normal">
-              Ne confiez plus aveuglément vos économies. Le <span className="font-bold text-amber-300">Groupe Kaniba</span> a mis en place le protocole d’acquisition juridique le plus strict pour les Maliens résidant en France, Espagne, États-Unis, Canada et Afrique de l'Ouest.
+            <p className="text-sm sm:text-lg text-stone-300 leading-relaxed font-normal">
+              {t.diaspora.subtitle}
             </p>
 
             {/* Diaspora Trust Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1 sm:pt-2">
               {diasporaPillars.map((pillar, idx) => {
                 const Icon = pillar.icon;
                 return (
-                  <div key={idx} className="p-4 rounded-xl bg-stone-800/80 border border-stone-700 flex flex-col justify-between">
+                  <div key={idx} className="p-3.5 sm:p-4 rounded-xl bg-stone-800/80 border border-stone-700 flex flex-col justify-between">
                     <div>
                       <div className="w-8 h-8 rounded-lg bg-emerald-900/60 text-amber-400 flex items-center justify-center mb-2.5">
                         <Icon className="w-4 h-4" />
                       </div>
-                      <h4 className="text-sm font-bold text-white mb-1">{pillar.title}</h4>
-                      <p className="text-xs text-stone-400 leading-normal">{pillar.text}</p>
+                      <h4 className="text-xs sm:text-sm font-bold text-white mb-1">{pillar.title}</h4>
+                      <p className="text-[11px] sm:text-xs text-stone-400 leading-relaxed">{pillar.text}</p>
                     </div>
                   </div>
                 );
@@ -94,64 +97,74 @@ export const DiasporaSection: React.FC = () => {
             </div>
 
             {/* Quick Action */}
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
               <a
                 href={generateWhatsAppLink(
                   CONTACT_INFO.whatsappPrimary,
-                  'Bonjour Groupe Kaniba, je réside à l’étranger et souhaite investir en toute sécurité dans un terrain ou une villa avec Titre Foncier à Bamako/Sirakoro.'
+                  language === 'es'
+                    ? 'Hola Groupe Kaniba, vivo en el extranjero y deseo coordinar una visita en vivo por videollamada de WhatsApp a los terrenos de Sirakoro (Malí 🇲🇱).'
+                    : language === 'en'
+                    ? 'Hello Groupe Kaniba, I live abroad and would like to schedule a live WhatsApp video tour of the Sirakoro plots (Mali 🇲🇱).'
+                    : 'Bonjour Groupe Kaniba, je réside à l’étranger et souhaite planifier une visite vidéo WhatsApp en direct à Sirakoro (Mali 🇲🇱).'
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-3.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-lg transition-colors flex items-center gap-2"
+                className="px-5 py-3 sm:px-6 sm:py-3.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2"
               >
                 <Video className="w-4 h-4" />
-                <span>Planifier Visite Vidéo en Direct (WhatsApp)</span>
+                <span>{t.diaspora.btnVideoCall}</span>
               </a>
 
-              <span className="text-xs text-stone-400">
-                Lignes directes : +223 70 15 65 65 / +223 95 95 95 62
+              <span className="text-[11px] sm:text-xs text-stone-400">
+                {t.diaspora.directLines}
               </span>
             </div>
 
           </div>
 
-          {/* Right Column: High Quality Photo + Diaspora Yield Calculator */}
-          <div className="lg:col-span-5 space-y-6">
+          {/* Right Column: Photo + Diaspora Yield Calculator */}
+          <div className="lg:col-span-5 space-y-4 sm:space-y-6 w-full">
             
-            {/* Joyful Diaspora Owner Photo */}
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-stone-700 bg-stone-800">
+            {/* Owner Photo with Malian Title */}
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-stone-700 bg-stone-800 w-full">
               <img
                 src={ASSETS.diasporaFamily}
-                alt="Propriétaire de la diaspora recevant son Titre Foncier à Bamako"
+                alt="Propriétaire diaspora Titre Foncier Mali 🇲🇱"
                 referrerPolicy="no-referrer"
                 className="w-full aspect-16/10 object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="text-[11px] font-mono text-amber-400 block font-semibold">Témoignage Vérifié</span>
+              <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white">
+                <span className="text-[10px] sm:text-[11px] font-mono text-amber-400 block font-semibold flex items-center gap-1">
+                  <span>🇲🇱</span>
+                  <span>{t.diaspora.testimonialBadge}</span>
+                </span>
                 <p className="text-xs font-medium text-stone-200 mt-0.5">
-                  "Après 12 ans à Paris, j’ai reçu les clés de ma villa à la Cité Kaniba et mon Titre Foncier sans le moindre souci."
+                  {t.diaspora.testimonialQuote}
                 </p>
-                <span className="text-[11px] text-stone-400 block mt-1">M. & Mme Keïta · Résidents en Île-de-France</span>
+                <span className="text-[10px] sm:text-[11px] text-stone-400 block mt-1">
+                  {t.diaspora.testimonialAuthor}
+                </span>
               </div>
             </div>
 
             {/* Interactive Diaspora Yield Calculator */}
-            <div className="p-5 rounded-2xl bg-stone-800/90 border border-stone-700 shadow-xl text-xs space-y-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-stone-800/90 border border-stone-700 shadow-xl text-xs space-y-3 sm:space-y-4 w-full">
               <div className="flex items-center justify-between pb-3 border-b border-stone-700">
                 <div className="flex items-center gap-2 font-bold text-amber-400">
                   <Calculator className="w-4 h-4" />
-                  <span className="text-sm">Simulateur Plus-Value Foncière Mali</span>
+                  <span className="text-xs sm:text-sm">{t.diaspora.calcTitle}</span>
                 </div>
-                <span className="text-[11px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">
-                  +18% /an (Sirakoro)
+                <span className="text-[10px] sm:text-[11px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold flex items-center gap-1">
+                  <span>🇲🇱</span>
+                  <span>{t.diaspora.calcRateBadge}</span>
                 </span>
               </div>
 
               {/* Slider Budget */}
               <div className="space-y-1.5">
-                <div className="flex justify-between font-medium">
-                  <span className="text-stone-300">Votre Capital d'Investissement:</span>
+                <div className="flex justify-between font-medium text-[11px] sm:text-xs">
+                  <span className="text-stone-300">{t.diaspora.calcCapitalLabel}</span>
                   <span className="font-bold text-amber-300 font-mono">
                     {investBudgetEur.toLocaleString('fr-FR')} € (~{formatCurrency(budgetFCFA, 'XOF')})
                   </span>
@@ -169,9 +182,9 @@ export const DiasporaSection: React.FC = () => {
 
               {/* Horizon slider */}
               <div className="space-y-1.5">
-                <div className="flex justify-between font-medium">
-                  <span className="text-stone-300">Horizon de Détention:</span>
-                  <span className="font-bold text-white font-mono">{yearsHolding} Ans</span>
+                <div className="flex justify-between font-medium text-[11px] sm:text-xs">
+                  <span className="text-stone-300">{t.diaspora.calcHorizonLabel}</span>
+                  <span className="font-bold text-white font-mono">{yearsHolding} {t.diaspora.calcYears}</span>
                 </div>
                 <div className="flex gap-2">
                   {[2, 3, 5, 8].map((yr) => (
@@ -182,22 +195,22 @@ export const DiasporaSection: React.FC = () => {
                         yearsHolding === yr ? 'bg-amber-500 text-stone-950' : 'bg-stone-700 text-stone-300'
                       }`}
                     >
-                      {yr} ans
+                      {yr} {t.diaspora.calcYears}
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Calculated Result */}
-              <div className="p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
+              <div className="p-3 sm:p-3.5 rounded-xl bg-stone-950 border border-stone-800 space-y-1.5 sm:space-y-2">
                 <div className="flex justify-between items-baseline">
-                  <span className="text-stone-400">Valeur Patrimoniale Estimée:</span>
-                  <span className="text-base sm:text-lg font-bold text-emerald-400 font-mono">
+                  <span className="text-stone-400 text-[11px] sm:text-xs">{t.diaspora.calcEstimatedVal}</span>
+                  <span className="text-sm sm:text-lg font-bold text-emerald-400 font-mono">
                     ~{Math.round(estimatedFutureEur).toLocaleString('fr-FR')} €
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-[11px]">
-                  <span className="text-stone-400">Gain Net Potentiel:</span>
+                <div className="flex justify-between items-baseline text-[10px] sm:text-[11px]">
+                  <span className="text-stone-400">{t.diaspora.calcNetGain}</span>
                   <span className="font-bold text-amber-400 font-mono">
                     +{Math.round(netGainEur).toLocaleString('fr-FR')} € (+{Math.round((netGainEur / investBudgetEur) * 100)}%)
                   </span>

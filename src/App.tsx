@@ -15,9 +15,10 @@ import { PrivacyBanner } from './components/PrivacyBanner';
 import { Footer } from './components/Footer';
 
 import { PROPERTIES, NOTIFICATIONS_DATA } from './data/mockData';
-import { Property, CurrencyCode, PropertyType, NotificationItem } from './types';
+import { Property, CurrencyCode, PropertyType, NotificationItem, Language } from './types';
 
 export default function App() {
+  const [language, setLanguage] = useState<Language>('es');
   const [currency, setCurrency] = useState<CurrencyCode>('XOF');
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
@@ -41,6 +42,11 @@ export default function App() {
     }
   }, [darkMode]);
 
+  // Sync document language attribute
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
   const toggleDarkMode = () => {
     setDarkMode((prev) => !prev);
   };
@@ -48,9 +54,9 @@ export default function App() {
   const handleTriggerNotification = (title: string, message: string) => {
     const newNotif: NotificationItem = {
       id: `notif-${Date.now()}`,
-      title,
-      message,
-      time: 'À l’instant',
+      title: { es: title, fr: title, en: title },
+      message: { es: message, fr: message, en: message },
+      time: { es: 'Al instante', fr: 'À l’instant', en: 'Just now' },
       type: 'system',
       read: false,
     };
@@ -87,12 +93,14 @@ export default function App() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100 transition-colors">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100 transition-colors">
       
-      {/* 1. Header (Adhering to Top Bar Contract) */}
+      {/* 1. Header with dedicated ES/FR/EN language switcher and Mali ribbons */}
       <Header
         currency={currency}
         onCurrencyChange={setCurrency}
+        language={language}
+        onLanguageChange={setLanguage}
         darkMode={darkMode}
         onToggleDarkMode={toggleDarkMode}
         onOpenNotifications={() => setNotificationsOpen(true)}
@@ -102,9 +110,10 @@ export default function App() {
         onNavigate={handleNavigate}
       />
 
-      <main className="flex-1">
-        {/* Block 1: The Hero Section */}
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
+        {/* Block 1: Hero Section */}
         <HeroSection
+          language={language}
           onSearch={handleHeroSearch}
           onExploreMap={handleExploreMap}
         />
@@ -113,6 +122,7 @@ export default function App() {
         <FeaturedCatalog
           properties={PROPERTIES}
           currency={currency}
+          language={language}
           onSelectProperty={setSelectedProperty}
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
@@ -122,40 +132,48 @@ export default function App() {
         <InteractiveMap
           properties={PROPERTIES}
           currency={currency}
+          language={language}
           onSelectProperty={setSelectedProperty}
         />
 
-        {/* Block 3: Construction & Projects ("Groupe Kaniba Construction") */}
-        <ConstructionSection />
+        {/* Block 3: Construction & Projects */}
+        <ConstructionSection language={language} />
 
-        {/* Block 4: Diaspora Section ("Tu propuesta estrella") */}
-        <DiasporaSection />
+        {/* Block 4: Diaspora Section */}
+        <DiasporaSection language={language} />
 
         {/* Tracking Tool & User Control Panel with Biometrics & Cloud Backup */}
         <TrackingAndDashboard
           currency={currency}
+          language={language}
           onTriggerNotification={handleTriggerNotification}
         />
 
         {/* Block 5: Contact, CTA & WhatsApp */}
         <ContactAndCtaSection
+          language={language}
           onFormSubmittedNotification={(name) => {
             handleTriggerNotification(
-              'Demande de Contact Reçue',
-              `Merci ${name}, un conseiller commercial du Groupe Kaniba va vous contacter sur WhatsApp sous 24h.`
+              language === 'es' ? 'Solicitud de Contacto Recibida 🇲🇱' : language === 'en' ? 'Contact Request Received 🇲🇱' : 'Demande de Contact Reçue 🇲🇱',
+              language === 'es'
+                ? `Gracias ${name}, un asesor de Groupe Kaniba te contactará por WhatsApp en menos de 24h.`
+                : language === 'en'
+                ? `Thank you ${name}, a Groupe Kaniba advisor will reach out to you via WhatsApp within 24h.`
+                : `Merci ${name}, un conseiller commercial du Groupe Kaniba va vous contacter sur WhatsApp sous 24h.`
             );
           }}
         />
       </main>
 
       {/* Footer */}
-      <Footer onNavigate={handleNavigate} />
+      <Footer language={language} onNavigate={handleNavigate} />
 
       {/* Property Detail Modal */}
       <PropertyDetailModal
         property={selectedProperty}
         onClose={() => setSelectedProperty(null)}
         currency={currency}
+        language={language}
       />
 
       {/* Customer Attention Bot (KanibaBot) */}
@@ -163,10 +181,11 @@ export default function App() {
         isOpen={botOpen}
         onClose={() => setBotOpen(false)}
         onOpen={() => setBotOpen(true)}
+        language={language}
       />
 
       {/* Always Visible Floating WhatsApp Button */}
-      <FloatingWhatsApp />
+      <FloatingWhatsApp language={language} />
 
       {/* Push Notifications Center */}
       <NotificationCenter
@@ -177,10 +196,11 @@ export default function App() {
         onNavigateAction={(action) => {
           handleNavigate(action);
         }}
+        language={language}
       />
 
       {/* Privacy APDP Mali Banner */}
-      <PrivacyBanner />
+      <PrivacyBanner language={language} />
 
     </div>
   );
